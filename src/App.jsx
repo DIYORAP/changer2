@@ -1,50 +1,87 @@
-import { useState } from 'react'
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-function App() {
-  const [color, setColor] = useState("olive")
+const SeatReservation = () => {
+  const [seats, setSeats] = useState([3]);
+  const [selectedSeat, setSelectedSeat] = useState(null);
+
+  useEffect(() => {
+    // Fetch seats from the API
+    const fetchSeats = async () => {
+      try {
+        //   const response = await axios.get('/api/seats'); // Adjust the endpoint as needed
+        // setSeats(response.data);
+      } catch (error) {
+        console.error("Error fetching seats:", error);
+      }
+    };
+
+    fetchSeats();
+  }, []);
+
+  const handleSeatClick = async (seat) => {
+    if (seat.seat_status === "available") {
+      try {
+        //  await axios.post('/api/reserve', { seat_number: seat.seat_number });
+        setSeats((prevSeats) =>
+          prevSeats.map((s) =>
+            s.seat_number === seat.seat_number
+              ? { ...s, seat_status: "reserved" }
+              : s
+          )
+        );
+        setSelectedSeat(seat.seat_number);
+      } catch (error) {
+        console.error("Error reserving seat:", error);
+      }
+    }
+  };
 
   return (
-    <>
-      <div className="w-full h-screen duration-200"
-           style={{backgroundColor: color}}>
-        <div className="fixed flex flex-wrap justify-center bottom-12 inset-x-0 px-2">
-          <div className="flex flex-wrap justify-center gap-3 shadow-lg bg-white px-2 py-2 rounded-3xl">
-            <button
-              onClick={() => setColor("red")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "red" }}>Red</button>
-            <button
-              onClick={() => setColor("green")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "green" }}>Green</button>
-            <button
-              onClick={() => setColor("yellow")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "yellow" }}>Yellow</button>
-            <button
-              onClick={() => setColor("blue")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "blue" }}>Blue</button>
-            <button
-              onClick={() => setColor("black")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "black" }}>Black</button>
-            <button
-              onClick={() => setColor("pink")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "pink" }}>Pink</button>
-            <button
-              onClick={() => setColor("#536728")}
-              className="outline-none px-2 py-1 rounded-full text-white shadow-lg"
-              style={{ backgroundColor: "#536728" }}>Custom Color</button>
+    <div>
+      <h1>Seat Reservation</h1>
+      <div className="seats-container">
+        {seats.map((seat) => (
+          <div
+            key={seat.seat_number}
+            className={`seat ${seat.seat_status}`}
+            onClick={() => handleSeatClick(seat)}
+          >
+            {seat.seat_number}
           </div>
-        </div>
+        ))}
       </div>
-    </>
-  )
-}
+      {selectedSeat && <p>Seat {selectedSeat} reserved!</p>}
+      <style jsx>{`
+        .seats-container {
+          display: flex;
+          flex-wrap: wrap;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .seat {
+          width: 50px;
+          height: 50px;
+          margin: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          background-color: lightgrey;
+          border: 1px solid grey;
+        }
+        .seat.available {
+          background-color: lightgreen;
+        }
+        .seat.reserved {
+          background-color: lightcoral;
+        }
+        .seat.sold {
+          background-color: grey;
+        }
+      `}</style>
+    </div>
+  );
+};
 
-export default App
+export default SeatReservation;
